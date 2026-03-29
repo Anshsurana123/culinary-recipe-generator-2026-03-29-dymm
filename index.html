@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Recipe Refiner</title>
+  <style>
+    :root {
+      --primary: #8B4513;
+      --secondary: #D2B48C;
+      --light: #F5F5DC;
+      --dark: #5D4037;
+      --accent: #FF6B35;
+      --text: #3E2723;
+      --success: #4CAF50;
+      --error: #F44336;
+      --shadow: 0 4px 8px rgba(0,0,0,0.1);
+      --radius: 12px;
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--light);
+      color: var(--text);
+      line-height: 1.6;
+      background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm27-69c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM65 95c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM34 39c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5z" fill="%23cbbba3" fill-opacity="0.2" fill-rule="evenodd"/></svg>');
+      background-attachment: fixed;
+    }
+
+    header {
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .logo {
+      font-size: 2.5rem;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius);
+      transition: var(--transition);
+    }
+
+    nav button:hover, nav button.active {
+      background: rgba(255,255,255,0.2);
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .section {
+      background: white;
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid var(--secondary);
+      padding-bottom: 0.5rem;
+    }
+
+    label {
+      display: block;
+      margin: 1rem 0 0.5rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+    }
+
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 1rem;
+    }
+
+    button:hover {
+      background-color: var(--dark);
+      transform: translateY(-2px);
+    }
+
+    button.secondary {
+      background-color: var(--secondary);
+    }
+
+    button.secondary:hover {
+      background-color: #c1a47c;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .card {
+      background: var(--light);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    }
+
+    .card-img {
+      height: 180px;
+      background-color: var(--secondary);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .card-body {
+      padding: 1rem;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+
+    .card-text {
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    .nutrition-info {
+      display: flex;
+      gap: 1rem;
+      margin: 1rem 0;
+      flex-wrap: wrap;
+    }
+
+    .nutrition-item {
+      background: var(--secondary);
+      padding: 0.5rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+    }
+
+    .nutrition-item strong {
+      display: block;
+      color: var(--dark);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-row > div {
+      flex: 1;
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .form-row {
+        flex-direction: column;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .illustration {
+      text-align: center;
+      margin: 2rem 0;
+      color: var(--secondary);
+      font-size: 5rem;
+    }
+
+    .tag {
+      display: inline-block;
+      background: var(--secondary);
+      color: var(--dark);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .tags {
+      margin: 1rem 0;
+    }
+
+    .meal-plan {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .meal-day {
+      background: var(--light);
+      border-radius: var(--radius);
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .meal-day h4 {
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .grocery-list {
+      list-style: none;
+      margin-top: 1rem;
+    }
+
+    .grocery-list li {
+      padding: 0.75rem;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .grocery-list li:last-child {
+      border-bottom: none;
+    }
+
+    .checkbox {
+      margin-right: 0.5rem;
+    }
+
+    .delivery-btns {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .delivery-btn {
+      flex: 1;
+      min-width: 120px;
+      background: white;
+      color: var(--text);
+      border: 1px solid #ddd;
+    }
+
+    .delivery-btn:hover {
+      background: #f9f9f9;
+    }
+
+    .error {
+      color: var(--error);
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+    }
+
+    .success {
+      color: var(--success);
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><span class="logo">🍲</span> Recipe Refiner</h1>
+    <p>Generate personalized recipes based on your dietary needs and ingredients</p>
+    <nav>
+      <button class="nav-btn active" data-tab="generator">Generator</button>
+      <button class="nav-btn" data-tab="mealplan">Meal Plan</button>
+      <button class="nav-btn" data-tab="grocery">Grocery List</button>
+      <button class="nav-btn" data-tab="saved">Saved Recipes</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Recipe Generator -->
+    <section id="generator" class="section active">
+      <h2>Generate a Recipe</h2>
+      <div class="form-row">
+        <div>
+          <label for="diet">Dietary Needs</label>
+          <select id="diet">
+            <option value="">No restrictions</option>
+            <option value="vegetarian">Vegetarian</option>
+            <option value="vegan">Vegan</option>
+            <option value="gluten-free">Gluten-Free</option>
+            <option value="dairy-free">Dairy-Free</option>
+            <option value="keto">Keto</option>
+            <option value="paleo">Paleo</option>
+          </select>
+        </div>
+        <div>
+          <label for="cuisine">Cuisine Preference</label>
+          <select id="cuisine">
+            <option value="">Any</option>
+            <option value="italian">Italian</option>
+            <option value="mexican">Mexican</option>
+            <option value="asian">Asian</option>
+            <option value="mediterranean">Mediterranean</option>
+            <option value="american">American</option>
+          </select>
+        </div>
+      </div>
+
+      <label for="ingredients">Available Ingredients (comma separated)</label>
+      <textarea id="ingredients" rows="3" placeholder="e.g. chicken, rice, broccoli, garlic"></textarea>
+
+      <label for="exclude">Ingredients to Avoid</label>
+      <input type="text" id="exclude" placeholder="e.g. nuts, mushrooms" />
+
+      <div class="form-row">
+        <div>
+          <label for="ready-time">Max Preparation Time (minutes)</label>
+          <select id="ready-time">
+            <option value="15">15</option>
+            <option value="30" selected>30</option>
+            <option value="45">45</option>
+            <option value="60">60</option>
+            <option value="90">90</option>
+          </select>
+        </div>
+        <div>
+          <label for="servings">Servings</label>
+          <select id="servings">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="generate-btn">Generate Recipe</button>
+      <div id="generator-feedback"></div>
+
+      <div id="recipe-output" style="display: none;">
+        <h3 id="recipe-title">Creamy Garlic Parmesan Chicken</h3>
+        <div class="tags">
+          <span class="tag" id="diet-tag">Gluten-Free</span>
+          <span class="tag" id="cuisine-tag">Italian</span>
+          <span class="tag">Ready in 25 min</span>
+        </div>
+        <div class="card-img" id="recipe-image" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"200\" viewBox=\"0 0 400 200\"><rect width=\"400\" height=\"200\" fill=\"%23d2b48c\"/><text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-family=\"Arial\" font-size=\"24\" fill=\"%238B4513\">Recipe Image</text></svg>')"></div>
+
+        <h4>Ingredients</h4>
+        <ul id="recipe-ingredients">
+          <!-- populated by JS -->
+        </ul>
+
+        <h4>Instructions</h4>
+        <ol id="recipe-instructions">
+          <!-- populated by JS -->
+        </ol>
+
+        <h4>Nutrition Facts (per serving)</h4>
+        <div class="nutrition-info">
+          <div class="nutrition-item">
+            <strong>Calories</strong>
+            <span id="calories">560</span>
+          </div>
+          <div class="nutrition-item">
+            <strong>Protein</strong>
+            <span id="protein">38g</span>
+          </div>
+          <div class="nutrition-item">
+            <strong>Carbs</strong>
+            <span id="carbs">12g</span>
+          </div>
+          <div class="nutrition-item">
+            <strong>Fat</strong>
+            <span id="fat">42g</span>
+          </div>
+        </div>
+
+        <h4>Ingredient Substitutions</h4>
+        <p id="substitutions">Parmesan cheese can be replaced with nutritional yeast for a dairy-free version. Chicken can be substituted with firm tofu for a vegetarian option.</p>
+
+        <div class="btn-group">
+          <button id="save-recipe-btn">Save Recipe</button>
+          <button id="add-to-mealplan-btn">Add to Meal Plan</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Meal Plan -->
+    <section id="mealplan" class="section">
+      <h2>Your Weekly Meal Plan</h2>
+      <p>Select recipes to add to your days. They will automatically appear in your grocery list.</p>
+      <div class="meal-plan" id="meal-plan-grid">
+        <div class="meal-day">
+          <h4>Monday</h4>
+          <button class="secondary add-meal-btn" data-day="monday">Add Recipe</button>
+          <div id="monday-recipe"></div>
+        </div>
+        <div class="meal-day">
+          <h4>Tuesday</h4>
+          <button class="secondary add-meal-btn" data-day="tuesday">Add Recipe</button>
+          <div id="tuesday-recipe"></div>
+        </div>
+        <div class="meal-day">
+          <h4>Wednesday</h4>
+          <button class="secondary add-meal-btn" data-day="wednesday">Add Recipe</button>
+          <div id="wednesday-recipe"></div>
+        </div>
+        <div class="meal-day">
+          <h4>Thursday</h4>
+          <button class="secondary add-meal-btn" data-day="thursday">Add Recipe</button>
+          <div id="thursday-recipe"></div>
+        </div>
+        <div class="meal-day">
+          <h4>Friday</h4>
+          <button class="secondary add-meal-btn" data-day="friday">Add Recipe</button>
+          <div id="friday-recipe"></div>
+        </div>
+        <div class="meal-day">
+          <h4>Saturday</h4>
+          <button class="secondary add-meal-btn" data-day="saturday">Add Recipe</button>
+          <div id="saturday-recipe"></div>
+        </div>
+        <div class="meal-day">
+          <h4>Sunday</h4>
+          <button class="secondary add-meal-btn" data-day="sunday">Add Recipe</button>
+          <div id="sunday-recipe"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Grocery List -->
+    <section id="grocery" class="section">
+      <h2>Grocery List</h2>
+      <p>Your list is automatically generated from your meal plan.</p>
+      <ul class="grocery-list" id="grocery-items">
+        <!-- populated by JS -->
+      </ul>
+      <p><strong>Total Estimated Cost: <span id="total-cost">$0.00</span></strong></p>
+      <div class="delivery-btns">
+        <button class="delivery-btn">Order via Instacart</button>
+        <button class="delivery-btn">Order via Amazon Fresh</button>
+        <button class="delivery-btn">Order via Walmart</button>
+      </div>
+    </section>
+
+    <!-- Saved Recipes -->
+    <section id="saved" class="section">
+      <h2>Saved Recipes</h2>
+      <p>Your favorite recipes are stored here for quick access.</p>
+      <div id="saved-recipes" class="grid">
+        <!-- populated by JS -->
+      </div>
+      <div id="no-saved" style="text-align: center; margin-top: 2rem; display: none;">
+        <div class="illustration">🔖</div>
+        <p>You haven't saved any recipes yet.</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // App state
+    const state = {
+      mealPlan: {
+        monday: null,
+        tuesday: null,
+        wednesday: null,
+        thursday: null,
+        friday: null,
+        saturday: null,
+        sunday: null
+      },
+      savedRecipes: [],
+      groceryList: []
+    };
+
+    // Sample recipes database
+    const recipeDatabase = [
+      {
+        id: 1,
+        title: "Creamy Garlic Parmesan Chicken",
+        cuisine: "italian",
+        diet: "gluten-free",
+        image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'><rect width='400' height='200' fill='%23c19a6b'/><circle cx='200' cy='100' r='60' fill='%238B4513'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='white'>Chicken</text></svg>",
+        ingredients: [
+          "4 boneless chicken breasts",
+          "2 tbsp olive oil",
+          "4 cloves garlic, minced",
+          "1 cup chicken broth",
+          "1 cup heavy cream",
+          "1 cup grated parmesan cheese",
+          "1 tsp Italian seasoning",
+          "Salt and pepper to taste",
+          "Fresh parsley for garnish"
+        ],
+        instructions: [
+          "Season chicken breasts with salt, pepper, and Italian seasoning.",
+          "Heat olive oil in a large skillet over medium heat. Add chicken and cook until golden brown and cooked through (about 6-7 minutes per side). Remove and set aside.",
+          "In the same skillet, add minced garlic and sauté for 30 seconds until fragrant.",
+          "Pour in chicken broth and scrape any browned bits from the bottom of the pan.",
+          "Stir in heavy cream and parmesan cheese. Simmer until sauce thickens slightly.",
+          "Return chicken to the skillet and coat with sauce. Simmer for 2-3 minutes.",
+          "Garnish with fresh parsley and serve immediately."
+        ],
+        nutrition: {
+          calories: 560,
+          protein: "38g",
+          carbs: "12g",
+          fat: "42g"
+        },
+        substitutions: "Parmesan cheese can be replaced with nutritional yeast for a dairy-free version. Chicken can be substituted with firm tofu for a vegetarian option.",
+        prepTime: 25,
+        servings: 4
+      },
+      {
+        id: 2,
+        title: "Vegan Buddha Bowl",
+        cuisine: "mediterranean",
+        diet: "vegan",
+        image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'><rect width='400' height='200' fill='%23d2b48c'/><circle cx='100' cy='100' r='30' fill='%23FFD700'/><circle cx='160' cy='90' r='25' fill='%2332CD32'/><circle cx='220' cy='110' r='35' fill='%238B4513'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='white'>Buddha Bowl</text></svg>",
+        ingredients: [
+          "1 cup quinoa, cooked",
+          "1 cup chickpeas, roasted",
+          "1 cup kale, massaged with lemon juice",
+          "1/2 avocado, sliced",
+          "1/2 cup shredded carrots",
+          "1/4 cup pumpkin seeds",
+          "2 tbsp tahini",
+          "1 tbsp lemon juice",
+          "1 tbsp maple syrup",
+          "2 tbsp water",
+          "Salt to taste"
+        ],
+        instructions: [
+          "Prepare quinoa according to package instructions and let cool slightly.",
+          "Massaging kale: Remove tough stems, chop leaves, and massage with a bit of lemon juice until softened.",
+          "Roast chickpeas: Toss with olive oil, salt, and spices. Roast at 400°F for 20-25 minutes until crispy.",
+          "Arrange quinoa, kale, chickpeas, avocado, and carrots in a bowl.",
+          "Sprinkle pumpkin seeds on top.",
+          "Whisk together tahini, lemon juice, maple syrup, water, and salt to make dressing.",
+          "Drizzle dressing over bowl and serve."
+        ],
+        nutrition: {
+          calories: 480,
+          protein: "15g",
+          carbs: "62g",
+          fat: "20g"
+        },
+        substitutions: "Swap quinoa for brown rice or couscous. Use sunflower seeds instead of pumpkin seeds. Replace tahini with almond butter.",
+        prepTime: 35,
+        servings: 2
+      },
+      {
+        id: 3,
+        title: "Spicy Tofu Tacos",
+        cuisine: "mexican",
+        diet: "vegetarian",
+        image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'><rect width='400' height='200' fill='%23e6ccb2'/><path d='M100,150 L300,150 L280,100 L120,100 Z' fill='%23D2691E'/><circle cx='160' cy='120' r='8' fill='%2332CD32'/><circle cx='200' cy='125' r='8' fill='%23FF6347'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='white'>Tacos</text></svg>",
+        ingredients: [
+          "1 block firm tofu, pressed and crumbled",
+          "2 tbsp taco seasoning",
+          "8 corn tortillas",
+          "1 cup shredded lettuce",
+          "1/2 cup diced tomatoes",
+          "1/4 cup chopped cilantro",
+          "1/2 avocado, sliced",
+          "1/4 cup salsa",
+          "1 lime, cut into wedges",
+          "1 tbsp olive oil"
+        ],
+        instructions: [
+          "Heat olive oil in a skillet over medium heat.",
+          "Add crumbled tofu and cook for 5 minutes, stirring occasionally.",
+          "Add taco seasoning and 2 tablespoons of water. Cook for another 5-7 minutes until heated through.",
+          "Warm tortillas in a dry skillet or microwave.",
+          "Fill each tortilla with tofu mixture.",
+          "Top with lettuce, tomatoes, cilantro, avocado, and salsa.",
+          "Serve with lime wedges on the side."
+        ],
+        nutrition: {
+          calories: 320,
+          protein: "14g",
+          carbs: "38g",
+          fat: "15g"
+        },
+        substitutions: "Use chicken or beef instead of tofu for non-vegetarian version. Substitute corn tortillas with flour tortillas if not gluten-free.",
+        prepTime: 30,
+        servings: 4
+      },
+      {
+        id: 4,
+        title: "Salmon with Lemon-Herb Quinoa",
+        cuisine: "american",
+        diet: "keto",
+        image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'><rect width='400' height='200' fill='%23f5e6ca'/><rect x='150' y='70' width='100' height='30' fill='%23FF6B35'/><rect x='140' y='60' width='120' height='15' fill='%238B4513'/><circle cx='200' cy='120' r='40' fill='%23D2B48C'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='white'>Salmon</text></svg>",
+        ingredients: [
+          "2 salmon fillets",
+          "2 cups cooked quinoa",
+          "2 tbsp olive oil",
+          "1 lemon (zested and juiced)",
+          "2 cloves garlic, minced",
+          "1 tbsp fresh dill, chopped",
+          "1 tbsp fresh parsley, chopped",
+          "Salt and pepper to taste",
+          "1/4 cup sliced almonds, toasted"
+        ],
+        instructions: [
+          "Preheat oven to 375°F. Line a baking sheet with parchment paper.",
+          "Place salmon fillets on the baking sheet. Drizzle with 1 tbsp olive oil and season with salt and pepper.",
+          "Bake for 12-15 minutes until salmon flakes easily with a fork.",
+          "In a bowl, mix cooked quinoa, lemon zest, lemon juice, minced garlic, dill, parsley, and remaining olive oil.",
+          "Season quinoa mixture with salt and pepper to taste.",
+          "Divide quinoa between two plates. Top with baked salmon.",
+          "Garnish with toasted sliced almonds and additional herbs if desired."
+        ],
+        nutrition: {
+          calories: 610,
+          protein: "38g",
+          carbs: "32g",
+          fat: "38g"
+        },
+        substitutions: "Substitute salmon with chicken breast or cod. Replace quinoa with cauliflower rice for lower carbs.",
+        prepTime: 25,
+        servings: 2
+      }
+    ];
+
+    // DOM Elements
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const sections = document.querySelectorAll('.section');
+    const generateBtn = document.getElementById('generate-btn');
+    const recipeOutput = document.getElementById('recipe-output');
+    const generatorFeedback = document.getElementById('generator-feedback');
+    const saveRecipeBtn = document.getElementById('save-recipe-btn');
+    const addToMealplanBtn = document.getElementById('add-to-mealplan-btn');
+    const addMealBtns = document.querySelectorAll('.add-meal-btn');
+    const groceryItems = document.getElementById('grocery-items');
+    const totalCost = document.getElementById('total-cost');
+    const savedRecipesContainer = document.getElementById('saved-recipes');
+    const noSavedMessage = document.getElementById('no-saved');
+
+    // Navigation
+    navBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        navBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.getAttribute('data-tab');
+        sections.forEach(section => {
+          section.classList.remove('active');
+          if (section.id === tab) section.classList.add('active');
+        });
+      });
+    });
+
+    // Generate Recipe
+    generateBtn.addEventListener('click', () => {
+      generatorFeedback.innerHTML = '';
+      const diet = document.getElementById('diet').value;
+      const cuisine = document.getElementById('cuisine').value;
+      const ingredients = document.getElementById('ingredients').value;
+      const exclude = document.getElementById('exclude').value;
+      const readyTime = parseInt(document.getElementById('ready-time').value);
+      const servings = parseInt(document.getElementById('servings').value);
+
+      // Validation
+      if (!ingredients.trim()) {
+        generatorFeedback.innerHTML = '<div class="error">Please enter at least one ingredient.</div>';
+        return;
+      }
+
+      // Simulate loading
+      generatorFeedback.innerHTML = '<div class="success">Generating recipe...</div>';
+      recipeOutput.style.display = 'none';
+
+      setTimeout(() => {
+        // Filter recipes based on criteria
+        let filtered = recipeDatabase.filter(recipe => {
+          let matchesDiet = !diet || recipe.diet === diet;
+          let matchesCuisine = !cuisine || recipe.cuisine === cuisine;
+          let matchesTime = recipe.prepTime <= readyTime;
+          return matchesDiet && matchesCuisine && matchesTime;
+        });
+
+        // If no matches, use any recipe that fits time
+        if (filtered.length === 0) {
+          filtered = recipeDatabase.filter(recipe => recipe.prepTime <= readyTime);
+        }
+
+        // Pick random recipe
+        const recipe = filtered[Math.floor(Math.random() * filtered.length)];
+
+        // Update output
+        document.getElementById('recipe-title').textContent = recipe.title;
+        document.getElementById('diet-tag').textContent = formatDiet(recipe.diet);
+        document.getElementById('cuisine-tag').textContent = formatCuisine(recipe.cuisine).charAt(0).toUpperCase() + formatCuisine(recipe.cuisine).slice(1);
+        document.getElementById('recipe-image').style.backgroundImage = `url('${recipe.image}')`;
+
+        // Update ingredients
+        const ingredientsList = document.getElementById('recipe-ingredients');
+        ingredientsList.innerHTML = '';
+        recipe.ingredients.forEach(ing => {
+          const li = document.createElement('li');
+          li.textContent = ing;
+          ingredientsList.appendChild(li);
+        });
+
+        // Update instructions
+        const instructionsList = document.getElementById('recipe-instructions');
+        instructionsList.innerHTML = '';
+        recipe.instructions.forEach(step => {
+          const li = document.createElement('li');
+          li.textContent = step;
+          instructionsList.appendChild(li);
+        });
+
+        // Update nutrition
+        document.getElementById('calories').textContent = recipe.nutrition.calories;
+        document.getElementById('protein').textContent = recipe.nutrition.protein;
+        document.getElementById('carbs').textContent = recipe.nutrition.carbs;
+        document.getElementById('fat').textContent = recipe.nutrition.fat;
+
+        // Update substitutions
+        document.getElementById('substitutions').textContent = recipe.substitutions;
+
+        // Show output
+        recipeOutput.style.display = 'block';
+        generatorFeedback.innerHTML = '<div class="success">Recipe generated successfully!</div>';
+      }, 800);
+    });
+
+    // Save Recipe
+    saveRecipeBtn.addEventListener('click', () => {
+      const title = document.getElementById('recipe-title').textContent;
+      if (state.savedRecipes.some(r => r.title === title)) {
+        alert('You already saved this recipe!');
+        return;
+      }
+
+      const newRecipe = recipeDatabase.find(r => r.title === title);
+      if (newRecipe) {
+        state.savedRecipes.push({...newRecipe});
+        updateSavedRecipes();
+        alert('Recipe saved successfully!');
+      }
+    });
+
+    // Add to Meal Plan
+    addToMealplanBtn.addEventListener('click', () => {
+      const title = document.getElementById('recipe-title').textContent;
+      const day = prompt('Which day would you like to add this recipe to? (e.g. Monday)').toLowerCase();
+      const validDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+      
+      if (!validDays.includes(day)) {
+        alert('Please enter a valid day of the week.');
+        return;
+      }
+
+      const recipe = recipeDatabase.find(r => r.title === title);
+      if (recipe) {
+        state.mealPlan[day] = {...recipe};
+        updateMealPlan();
+        updateGroceryList();
+        alert(`Recipe added to ${day.charAt(0).toUpperCase() + day.slice(1)}!`);
+      }
+    });
+
+    // Add Meal Button Clicks
+    addMealBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const day = btn.getAttribute('data-day');
+        const recipeTitle = prompt(`Enter the recipe name for ${day.charAt(0).toUpperCase() + day.slice(1)}:`);
+        if (!recipeTitle) return;
+
+        const recipe = recipeDatabase.find(r => r.title.toLowerCase().includes(recipeTitle.toLowerCase()));
+        if (recipe) {
+          state.mealPlan[day] = {...recipe};
+          updateMealPlan();
+          updateGroceryList();
+          alert(`Recipe added to ${day.charAt(0).toUpperCase() + day.slice(1)}!`);
+        } else {
+          alert('Recipe not found in database. Try "Creamy Garlic Parmesan Chicken", "Vegan Buddha Bowl", "Spicy Tofu Tacos", or "Salmon with Lemon-Herb Quinoa".');
+        }
+      });
+    });
+
+    // Update Meal Plan Display
+    function updateMealPlan() {
+      Object.keys(state.mealPlan).forEach(day => {
+        const container = document.getElementById(`${day}-recipe`);
+        if (state.mealPlan[day]) {
+          container.innerHTML = `
+            <p><strong>${state.mealPlan[day].title}</strong></p>
+            <button class="secondary remove-meal-btn" data-day="${day}">Remove</button>
+          `;
+        } else {
+          container.innerHTML = '';
+        }
+      });
+
+      // Add event listeners to remove buttons
+      document.querySelectorAll('.remove-meal-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const day = btn.getAttribute('data-day');
+          state.mealPlan[day] = null;
+          updateMealPlan();
+          updateGroceryList();
+        });
+      });
+    }
+
+    // Update Grocery List
+    function updateGroceryList() {
+      const ingredients = new Map();
+      let total = 0;
+
+      Object.values(state.mealPlan).forEach(recipe => {
+        if (recipe) {
+          recipe.ingredients.forEach(ing => {
+            // Extract quantity and ingredient name (simple parsing)
+            const match = ing.match(/^(\d+\/?\d* ?\w*) (.+)/);
+            let quantity = '1';
+            let ingredient = ing;
+            if (match) {
+              quantity = match[1];
+              ingredient = match[2];
+            }
+
+            if (ingredients.has(ingredient)) {
+              ingredients.set(ingredient, ingredients.get(ingredient) + ', ' + quantity);
+            } else {
+              ingredients.set(ingredient, quantity);
+            }
+
+            // Simple cost estimation
+            total += Math.random() * 3 + 1; // Random cost between $1 and $4 per ingredient
+          });
+        }
+      });
+
+      groceryItems.innerHTML = '';
+      if (ingredients.size === 0) {
+        groceryItems.innerHTML = '<li>Your grocery list is empty. Add recipes to your meal plan first.</li>';
+      } else {
+        ingredients.forEach((quantity, ingredient) => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <span>
+              <input type="checkbox" class="checkbox"> 
+              <span>${quantity} ${ingredient}</span>
+            </span>
+            <span>$${(Math.random() * 5 + 1).toFixed(2)}</span>
+          `;
+          groceryItems.appendChild(li);
+        });
+      }
+
+      totalCost.textContent = `$${total.toFixed(2)}`;
+
+      // Add checkbox functionality
+      document.querySelectorAll('.checkbox').forEach(cb => {
+        cb.addEventListener('change', () => {
+          const span = cb.parentElement.querySelector('span');
+          if (cb.checked) {
+            span.style.textDecoration = 'line-through';
+            span.style.color = '#888';
+          } else {
+            span.style.textDecoration = 'none';
+            span.style.color = 'initial';
+          }
+        });
+      });
+    }
+
+    // Update Saved Recipes
+    function updateSavedRecipes() {
+      savedRecipesContainer.innerHTML = '';
+      if (state.savedRecipes.length === 0) {
+        noSavedMessage.style.display = 'block';
+      } else {
+        noSavedMessage.style.display = 'none';
+        state.savedRecipes.forEach(recipe => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <div class="card-img" style="background-image: url('${recipe.image}')"></div>
+            <div class="card-body">
+              <h3 class="card-title">${recipe.title}</h3>
+              <div class="tags">
+                <span class="tag">${formatDiet(recipe.diet)}</span>
+                <span class="tag">${formatCuisine(recipe.cuisine)}</span>
+              </div>
+              <p class="card-text">${recipe.instructions[0].substring(0, 100)}...</p>
+              <button class="secondary view-recipe-btn" data-id="${recipe.id}">View Recipe</button>
+              <button class="secondary remove-recipe-btn" data-id="${recipe.id}">Remove</button>
+            </div>
+          `;
+          savedRecipesContainer.appendChild(card);
+        });
+
+        // Add event listeners
+        document.querySelectorAll('.view-recipe-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = parseInt(btn.getAttribute('data-id'));
+            const recipe = recipeDatabase.find(r => r.id === id);
+            if (recipe) {
+              // Populate recipe output
+              document.getElementById('recipe-title').textContent = recipe.title;
+              document.getElementById('diet-tag').textContent = formatDiet(recipe.diet);
+              document.getElementById('cuisine-tag').textContent = formatCuisine(recipe.cuisine);
+              document.getElementById('recipe-image').style.backgroundImage = `url('${recipe.image}')`;
+
+              // Update ingredients
+              const ingredientsList = document.getElementById('recipe-ingredients');
+              ingredientsList.innerHTML = '';
+              recipe.ingredients.forEach(ing => {
+                const li = document.createElement('li');
+                li.textContent = ing;
+                ingredientsList.appendChild(li);
+              });
+
+              // Update instructions
+              const instructionsList = document.getElementById('recipe-instructions');
+              instructionsList.innerHTML = '';
+              recipe.instructions.forEach(step => {
+                const li = document.createElement('li');
+                li.textContent = step;
+                instructionsList.appendChild(li);
+              });
+
+              // Update nutrition
+              document.getElementById('calories').textContent = recipe.nutrition.calories;
+              document.getElementById('protein').textContent = recipe.nutrition.protein;
+              document.getElementById('carbs').textContent = recipe.nutrition.carbs;
+              document.getElementById('fat').textContent = recipe.nutrition.fat;
+
+              // Update substitutions
+              document.getElementById('substitutions').textContent = recipe.substitutions;
+
+              // Show output
+              recipeOutput.style.display = 'block';
+
+              // Switch to generator tab
+              navBtns.forEach(b => b.classList.remove('active'));
+              document.querySelector('[data-tab="generator"]').classList.add('active');
+              sections.forEach(section => section.classList.remove('active'));
+              document.getElementById('generator').classList.add('active');
+            }
+          });
+        });
+
+        document.querySelectorAll('.remove-recipe-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = parseInt(btn.getAttribute('data-id'));
+            state.savedRecipes = state.savedRecipes.filter(r => r.id !== id);
+            updateSavedRecipes();
+            alert('Recipe removed from saved.');
+          });
+        });
+      }
+    }
+
+    // Helper functions
+    function formatDiet(diet) {
+      return diet.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+
+    function formatCuisine(cuisine) {
+      return cuisine.charAt(0).toUpperCase() + cuisine.slice(1);
+    }
+
+    // Initialize
+    updateMealPlan();
+    updateGroceryList();
+    updateSavedRecipes();
+  </script>
+</body>
+</html>
